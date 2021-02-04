@@ -1,6 +1,5 @@
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
-
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'scrooloose/nerdtree'
 "Plug 'tsony-tsonev/nerdtree-git-plugin'
@@ -23,6 +22,13 @@ Plug 'junegunn/fzf.vim'
 " Initialize plugin system
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
+Plug 'tpope/vim-surround'
+Plug 'mattn/emmet-vim'
+Plug 'bling/vim-airline'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'jiangmiao/auto-pairs'
+Plug 'nathanaelkane/vim-indent-guides'
+Plug 'voldikss/vim-floaterm'
 call plug#end()
 let mapleader="\<Space>"
 set background=dark
@@ -234,4 +240,9 @@ inoremap <A-k> <Esc>:m .-2<CR>==gi
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gv
 nnoremap <silent> <Leader>f :Ag<CR>
+autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
+nnoremap * *<c-o>
+let g:floaterm_keymap_new = '<F7>'
+let g:floaterm_keymap_toggle = '<F12>'
+
 
