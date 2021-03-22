@@ -2,7 +2,7 @@
 call plug#begin('~/.vim/plugged')
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'scrooloose/nerdtree'
-"Plug 'tsony-tsonev/nerdtree-git-plugin'
+Plug 'christoomey/vim-tmux-navigator'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'ntk148v/vim-horizon'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
@@ -10,16 +10,12 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'airblade/vim-gitgutter'
 Plug 'ctrlpvim/ctrlp.vim' " fuzzy find files
 Plug 'scrooloose/nerdcommenter'
-"Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'dyng/ctrlsf.vim'
 Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'christoomey/vim-tmux-navigator'
 Plug 'morhetz/gruvbox'
 Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
-Plug '907th/vim-auto-save'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-" Initialize plugin system
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
 Plug 'tpope/vim-surround'
@@ -29,6 +25,8 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'jiangmiao/auto-pairs'
 Plug 'nathanaelkane/vim-indent-guides'
 Plug 'voldikss/vim-floaterm'
+Plug 'puremourning/vimspector'
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 call plug#end()
 let mapleader="\<Space>"
 set background=dark
@@ -155,7 +153,6 @@ endfunction
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Remap for rename current word
-nmap <F2> <Plug>(coc-rename)
 
 " Remap for format selected region
 xmap <leader>f  <Plug>(coc-format-selected)
@@ -243,6 +240,13 @@ nnoremap <silent> <Leader>f :Ag<CR>
 autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
 nnoremap * *<c-o>
 let g:floaterm_keymap_new = '<F7>'
-let g:floaterm_keymap_toggle = '<F12>'
 
+nmap <F2> <Plug>(coc-rename)
+let g:floaterm_keymap_toggle = '<F12>'
+let g:vimspector_enable_mappings = 'VISUAL_STUDIO'
+let NERDTreeShowHidden=1
+let $FZF_DEFAULT_COMMAND='find -L'
+let g:go_def_mapping_enabled=0
+autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact
+let g:bettercomments_language_aliases = { 'javascript': 'js', 'typescript': 'ts' }
 
