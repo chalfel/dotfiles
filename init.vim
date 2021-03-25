@@ -27,6 +27,7 @@ Plug 'nathanaelkane/vim-indent-guides'
 Plug 'voldikss/vim-floaterm'
 Plug 'puremourning/vimspector'
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+Plug 'szw/vim-maximizer'
 call plug#end()
 let mapleader="\<Space>"
 set background=dark
@@ -249,4 +250,11 @@ let $FZF_DEFAULT_COMMAND='find -L'
 let g:go_def_mapping_enabled=0
 autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact
 let g:bettercomments_language_aliases = { 'javascript': 'js', 'typescript': 'ts' }
-
+nnoremap <leader>dd :call vimspector#Launch()<CR>
+nnoremap <leader>de :call vimspector#Reset()<CR>
+nmap <leader>dl <Plug>VimspectorStepInto
+nmap <leader>dj <Plug>VimspectorStepOver
+nmap <leader>dk <Plug>VimspectorStepOut
+nmap <leader>d_ <Plug>VimspectorRestart
+nmap <leader>db <Plug>VimspectorToggleBreakpoint
+nnoremap <leader>d<space> :call vimspector#Continue()<CR>
