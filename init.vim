@@ -257,4 +257,5 @@ nmap <leader>dj <Plug>VimspectorStepOver
 nmap <leader>dk <Plug>VimspectorStepOut
 nmap <leader>d_ <Plug>VimspectorRestart
 nmap <leader>db <Plug>VimspectorToggleBreakpoint
+nmap <leader> drc <Plug>VimspectorRunToCursor
 nnoremap <leader>d<space> :call vimspector#Continue()<CR>
