@@ -11,26 +11,20 @@ Plug 'airblade/vim-gitgutter'
 Plug 'ctrlpvim/ctrlp.vim' " fuzzy find files
 Plug 'scrooloose/nerdcommenter'
 Plug 'dyng/ctrlsf.vim'
-Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'morhetz/gruvbox'
 Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
 Plug 'tpope/vim-surround'
-Plug 'mattn/emmet-vim'
 Plug 'bling/vim-airline'
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'jiangmiao/auto-pairs'
 Plug 'nathanaelkane/vim-indent-guides'
 Plug 'voldikss/vim-floaterm'
 Plug 'puremourning/vimspector'
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
-Plug 'szw/vim-maximizer'
 call plug#end()
 let mapleader="\<Space>"
-set background=dark
 " sync open file with NERDTree
 " " Check if NERDTree is open or active
 inoremap jk <ESC>
@@ -71,8 +65,11 @@ let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclu
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
 noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
 
-set relativenumber
-
+set number 
+set noswapfile 
+set hlsearch 
+set ignorecase 
+set incsearch 
 set smarttab
 set cindent
 set tabstop=2
@@ -170,7 +167,6 @@ augroup end
 " Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
 xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
-
 " Remap for do codeAction of current line
 nmap <leader>ac  <Plug>(coc-codeaction)
 " Fix autofix problem of current line
@@ -215,20 +211,14 @@ nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>i
-set syntax=groovy
-set guifont=FiraCode\ Nerd\ Font\ Medium\ 12
 set termguicolors
 
-colorscheme horizon
 let g:lightline = {}
 let g:lightline.colorscheme = 'horizon'
-syntax enable
-"colorscheme dracula
 nnoremap <leader>t :NERDTreeToggle<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
-nnoremap <silent> <C-f> :Files<CR>
-
+nnoremap <silent> <C-f> :GFiles<CR>
 vmap <C-_> <plug>NERDCommenterToggle
 nmap <C-_> <plug>NERDCommenterToggle
 nnoremap <A-j> :m .+1<CR>==
@@ -259,3 +249,7 @@ nmap <leader>d_ <Plug>VimspectorRestart
 nmap <leader>db <Plug>VimspectorToggleBreakpoint
 nmap <leader> drc <Plug>VimspectorRunToCursor
 nnoremap <leader>d<space> :call vimspector#Continue()<CR>
+
+colorscheme horizon
+set background=dark
+nmap <Esc> :call coc#float#close_all() <CR>
