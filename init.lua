@@ -10,17 +10,21 @@ vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 
 vim.cmd([[ set clipboard=unnamedplus ]])
 
+
+
 require("packer").startup(function(use)
+	use {
+		'akinsho/flutter-tools.nvim',
+		requires = {
+			'nvim-lua/plenary.nvim',
+			'stevearc/dressing.nvim', -- optional for vim.ui.select
+		},
+	}
 	use { "wbthomason/packer.nvim" }
 	use { "ellisonleao/gruvbox.nvim" }
 	use { "zbirenbaum/copilot.lua" }
-	use {
-		"zbirenbaum/copilot-cmp",
-		after = { "copilot.lua" },
-		config = function()
-			require("copilot_cmp").setup()
-		end
-	}
+	use { "zbirenbaum/copilot-cmp" }
+	use { 'echasnovski/mini.surround' }
 	use { "hashivim/vim-terraform" }
 	use { 'mfussenegger/nvim-dap' }
 	use "folke/neodev.nvim"
@@ -73,26 +77,6 @@ require("neodev").setup({
 })
 
 require("dapui").setup()
-require("copilot").setup({
-	suggestion = { enabled = false },
-	panel = { enabled = false },
-})
-
-
-local cmp = require('cmp')
-local cmp_action = require('lsp-zero').cmp_action()
-
-cmp.setup({
-	mapping = {
-		-- `Enter` key to confirm completion
-		['<CR>'] = cmp.mapping.confirm({ select = false }),
-		-- Ctrl+Space to trigger completion menu
-		['<C-Space>'] = cmp.mapping.complete(),
-		-- Navigate between snippet placeholder
-		['<C-f>'] = cmp_action.luasnip_jump_forward(),
-		['<C-b>'] = cmp_action.luasnip_jump_backward(),
-	}
-})
 
 -- some
 vim.keymap.set("n", "<M-b>", ":Ex<CR>")
@@ -214,11 +198,12 @@ vim.cmd([[
 	augroup END
 ]])
 
-vim.keymap.set('n', '<leader>lca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+vim.keymap.set('n', '<leader>.', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
 
 vim.o.background = "dark"
 
 vim.keymap.set("i", "jj", "<Esc>")
+vim.keymap.set("i", "<C-c>", "<Esc>")
 
 vim.opt.guicursor = "i:block"
 vim.opt.tabstop = 4
@@ -347,7 +332,6 @@ local set_namespace = vim.api.nvim__set_hl_ns or vim.api.nvim_set_hl_ns
 local namespace = vim.api.nvim_create_namespace("dap-hlng")
 
 
-
 vim.api.nvim_set_hl(0, 'DapBreakpoint', { ctermbg = 0, fg = '#993939' })
 vim.api.nvim_set_hl(0, 'DapLogPoint', { ctermbg = 0, fg = '#61afef', bg = '#31353f' })
 vim.api.nvim_set_hl(0, 'DapStopped', { ctermbg = 0, fg = '#98c379', bg = '#31353f' })
@@ -376,20 +360,20 @@ vim.g.multi_cursor_select_all_word_key = 'ga'
 vim.keymap.set("n", "<leader>e", vim.cmd.Ex)
 
 local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
-local lsp_format_on_save = function(bufnr)
-	vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-	vim.api.nvim_create_autocmd('BufWritePre', {
-		group = augroup,
-		buffer = bufnr,
-		callback = function()
-			vim.lsp.buf.format()
-			filter = function(client)
-				return client.name == "null-ls"
-			end
-		end,
-	})
-end
-
+-- local lsp_format_on_save = function(bufnr)
+-- 	vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+-- 	vim.api.nvim_create_autocmd('BufWritePre', {
+-- 		group = augroup,
+-- 		buffer = bufnr,
+-- 		callback = function()
+-- 			vim.lsp.buf.format()
+-- 			filter = function(client)
+-- 				return client.name == "null-ls"
+-- 			end
+-- 		end,
+-- 	})
+-- end
+--
 vim.keymap.set('n', '<leader>de', function() require('dap').continue() end)
 vim.keymap.set('n', '<leader>dl', function() require('dap').run_last() end)
 
@@ -398,8 +382,124 @@ vim.keymap.set('n', '<leader>dh', function() require("dapui").float_element() en
 vim.keymap.set('n', '<leader>dv', function() require("dapui").eval() end)
 
 local lsp = require('lsp-zero')
-lsp.preset('recommended')
+
+require('copilot').setup({
+	suggestion = { enabled = false },
+	panel = { enabled = false },
+	formatters = {
+		label = require("copilot_cmp.format").format_label_text,
+		insert_text = require("copilot_cmp.format").format_insert_text,
+		preview = require("copilot_cmp.format").deindent,
+	},
+})
+
+lsp.format_on_save({
+	format_opts = {
+		timeout_ms = 10000,
+	},
+	servers = {
+		['lua_ls'] = { 'lua' },
+		['rust_analyzer'] = { 'rust' },
+		["gopls"] = { 'go' },
+		["tsserver"] = { 'typescript' },
+	}
+})
+
+require('copilot_cmp').setup()
+
+local cmp = require('cmp')
+local cmp_action = require('lsp-zero').cmp_action()
+
+vim.g.copilot_filetypes = {
+	["*"] = true,
+}
+cmp.setup({
+	mapping = {
+		-- `Enter` key to confirm completion
+		['<CR>'] = cmp.mapping.confirm({
+			select = false,
+			behavior = cmp.ConfirmBehavior.Replace,
+		}),
+		-- Ctrl+Space to trigger completion menu
+		['<C-Space>'] = cmp.mapping.complete(),
+		-- Navigate between snippet placeholder
+		['<C-f>'] = cmp_action.luasnip_jump_forward(),
+		['<C-b>'] = cmp_action.luasnip_jump_backward(),
+	},
+	sources = {
+		{ name = 'copilot' },
+		{ name = 'nvim_lsp' },
+	},
+})
+local lsp = require('lsp-zero').preset({})
 
 lsp.on_attach(function(client, bufnr)
-	lsp_format_on_save(bufnr)
+	lsp.default_keymaps({ buffer = bufnr })
 end)
+
+lsp.setup()
+lsp.preset('recommended')
+lsp.setup_servers({ 'dartls', force = true })
+
+
+
+-- lsp.on_attach(function(client, bufnr)
+-- 	lsp_format_on_save(bufnr)
+-- end)
+
+local dart_lsp = lsp.build_options('dartls', {})
+
+require('flutter-tools').setup({
+	flutter_path = "/Users/caiofelix/development/flutter/bin/flutter",
+	lsp = {
+		capabilities = dart_lsp.capabilities
+	},
+	debugger = {
+		-- integrate with nvim dap + install dart code debugger
+		enabled = true,
+		run_via_dap = true, -- use dap instead of a plenary job to run flutter apps
+		-- if empty dap will not stop on any exceptions, otherwise it will stop on those specified
+		-- see |:help dap.set_exception_breakpoints()| for more info
+		exception_breakpoints = {},
+		register_configurations = function(paths)
+			require("dap").configurations.dart = {
+				{
+					name = "Flutter",
+					program = "lib/main.dart",
+					request = "launch",
+					type = "dart"
+				}
+			}
+		end,
+	},
+})
+
+local keymap = vim.keymap.set
+local silent = { silent = true }
+keymap("n", "H", "^", silent)
+keymap("x", "K", ":move '<-2<CR>gv-gv", silent)
+keymap("x", "J", ":move '>+1<CR>gv-gv", silent)
+-- Remove highlights
+keymap("n", "<CR>", ":noh<CR><CR>", silent)
+-- Buffers
+keymap("n", "<Tab>", ":BufferNext<CR>", silent)
+keymap("n", "gn", ":bn<CR>", silent)
+keymap("n", "<S-Tab>", ":BufferPrevious<CR>", silent)
+keymap("n", "gp", ":bp<CR>", silent)
+keymap("n", "<S-q>", ":BufferClose<CR>", silent)
+
+keymap("n", "<leader>q", "<cmd>lua require('utils').toggle_quicklist()<CR>", silent)
+--keymap("n", "gr", "<cmd>lua vim.lsp.buf.references({ includeDeclaration = false })<CR>", silent)
+keymap("n", "<leader>cl", "<cmd>lua vim.diagnostic.open_float({ border = 'rounded', max_width = 100 })<CR>", silent)
+keymap("n", "L", "<cmd>lua vim.lsp.buf.signature_help()<CR>", silent)
+require('mini.surround').setup()
+
+vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<cr>', { buffer = true })
+vim.api.nvim_set_keymap("n", "QQ", ":q!<enter>", { noremap = false })
+vim.api.nvim_set_keymap("n", "WW", ":w!<enter>", { noremap = false })
+vim.api.nvim_set_keymap("n", "<leader>ga", ":Git add ", { noremap = false })
+vim.api.nvim_set_keymap("n", "<leader>gc", ":Git commit -m \"", { noremap = false })
+vim.api.nvim_set_keymap("n", "<leader>gp", ":Git push -u origin HEAD<CR>", { noremap = false })
+vim.keymap.set('n', 'H', '{', { buffer = true })
+vim.keymap.set('n', 'J', '}', { buffer = true })
+vim.keymap.set('n', 's', '', { buffer = true })
